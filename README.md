@@ -1,4 +1,4 @@
-<FILE filename="README.txt">
+
 # 🛡️ IoHT-Shield
 ## Blockchain-Assisted Anomaly Detection Framework for Securing IoHT Devices
 Final Year Project | IEEE Research Paper Implementation
@@ -217,4 +217,4 @@ Bashpython run_app.py
 
 Ready to test?
 Open the dashboard and try it out. Any issues or suggestions? Just open an issue.
-</FILE>
+
