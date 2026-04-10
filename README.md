@@ -1,222 +1,220 @@
+<FILE filename="README.txt">
 # 🛡️ IoHT-Shield
 ## Blockchain-Assisted Anomaly Detection Framework for Securing IoHT Devices
+Final Year Project | IEEE Research Paper Implementation
+Built with FastAPI, Scikit-learn, TensorFlow, Web3.py, Solidity & Ethereum
 
-> **Final Year Project** | IEEE Research Paper Implementation  
-> **Stack**: FastAPI · Scikit-learn · TensorFlow/Keras · Web3.py · Ethereum · Solidity · React.js (optional)
-
----
-
-## 📁 Project Structure
-IoHT-Shield/
+📁 Project Structure
+textIoHT-Shield/
 ├── ffrontend/                      ← Frontend folder
-│   └── dashboard.html              ← Standalone web app (open in browser, no setup needed)
-├── run_app.py                      ← One-click backend launcher
+│   └── dashboard.html              ← Standalone web dashboard (zero setup)
+├── run_app.py                      ← One-click backend starter
 ├── requirements.txt
 ├── backend/
-│   ├── main.py                     ← FastAPI entry point
+│   ├── main.py
 │   ├── api/
-│   │   ├── routes.py               ← All REST + WebSocket endpoints
-│   │   └── schemas.py              ← Pydantic models
+│   │   ├── routes.py
+│   │   └── schemas.py
 │   ├── ml/
 │   │   ├── isolation_forest.py
 │   │   ├── lstm_autoencoder.py
 │   │   ├── preprocessor.py
-│   │   └── classical_models.py     ← One-Class SVM + Random Forest
+│   │   └── classical_models.py
 │   ├── blockchain/
 │   │   ├── web3_client.py
 │   │   ├── deploy.py
 │   │   └── contracts/
 │   │       └── AnomalyLog.sol
-│   └── models/                     ← Auto-generated (scalers, ML models, etc.)
+│   └── models/                     ← (auto-created)
 └── docs/
-└── IEEE_Research_Paper.md      ← Full IEEE paper
-text---
+    └── IEEE_Research_Paper.md
 
-## 🚀 Quick Start (Standalone Demo)
+🚀 Quick Start (No Setup Needed)
 
-**No installation required!**
+Just open ffrontend/dashboard.html in any browser.
+Login with:
+Username: admin
+Password: iothshield
 
-1. Open `ffrontend/dashboard.html` in any modern browser.
-2. Login:  
-   **Username**: `admin`  
-   **Password**: `iothshield`
+You’ll instantly get:
 
-**Features available immediately**:
-- Live anomaly monitoring simulation
-- Blockchain log visualization
-- ML model metrics + ROC curves
-- Manual anomaly prediction
-- System architecture diagrams
+Live anomaly simulation
+Blockchain logs
+ML metrics & charts
+Manual prediction tester
 
----
 
-## ⚙️ Full System Setup
+⚙️ Full Setup (Backend + Blockchain)
+Prerequisites
 
-### Prerequisites
-- Python 3.10+
-- Node.js (for Ganache CLI)
-- Ganache (local Ethereum testnet)
+Python 3.10+
+Node.js (for Ganache)
 
-### Step 1 — Install Dependencies
-
-```bash
-pip install -r requirements.txt
-Step 2 — Start Local Blockchain (Ganache)
-Bash# Install once (if not already installed)
-npm install -g ganache
-
-# Start Ganache (keep this terminal open)
+Step 1: Install Python packages
+Bashpip install -r requirements.txt
+Step 2: Start Ganache (Local Ethereum)
+Bash# Run this in a separate terminal
 ganache --port 8545 --accounts 10 --deterministic
-Step 3 — Deploy Smart Contract
+Step 3: Deploy Smart Contract
 Bashcd backend
 python blockchain/deploy.py
-This compiles AnomalyLog.sol, deploys it to Ganache, saves the ABI, and writes CONTRACT_ADDRESS to .env.
-Step 4 — Run FastAPI Backend
-Recommended (One-click):
+Step 4: Run the Backend
+Easiest way:
 Bashpython run_app.py
-Manual:
+Or manually:
 Bashcd backend
 uvicorn main:app --reload --port 8000
-API documentation → http://localhost:8000/docs
+API docs will be at: http://localhost:8000/docs
 
-📡 API Reference
+📡 Main API Endpoints
 
+MethodEndpointWhat it doesPOST/api/predictDetect anomaly + log to blockchainPOST/api/ingestLive data ingest + WebSocket broadcastPOST/api/upload-dataUpload your dataset (CSV/JSON)POST/api/trainRetrain models in backgroundGET/api/logsGet all blockchain entriesWS/api/ws/streamReal-time updates
 
+🧠 ML Models Used
 
+Isolation Forest – 96.2% accuracy
+LSTM Autoencoder – 97.8% accuracy
+Ensemble (both models) – 98.1% accuracy
 
+All models are unsupervised. Classical models (SVM + Random Forest) are also included for future use.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-MethodEndpointDescriptionPOST/api/upload-dataUpload CSV/JSON IoHT datasetPOST/api/predictSingle-point anomaly detection + blockchain logPOST/api/ingestLive ingest + WebSocket broadcastPOST/api/trainTrain/retrain models (background)GET/api/train-status/{job_id}Check training statusGET/api/logsFetch blockchain anomaly logsGET/api/devicesList active IoHT devices (simulated)GET/api/model-statsML performance metricsGET/api/models/availableList available models & readinessWS/api/ws/streamReal-time prediction & event stream
-
-🧠 ML Models
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ModelTypeAccuracyF1-ScoreAUC-ROCNotesIsolation ForestUnsupervised96.2%0.9440.961Fast outlier detectionLSTM AutoencoderUnsupervised (time-series)97.8%0.9610.982Learns normal patternsEnsembleHybrid98.1%0.969—Flags if either model detects anomaly
-Classical models (One-Class SVM + Random Forest) are included for future supervised extensions.
-
-⛓️ Blockchain Integration
-Contract: AnomalyLog.sol (Solidity 0.8.19)
-Every detected anomaly is permanently logged on-chain with:
-
-device_id
-timestamp
-anomaly_score (fused)
-if_score, lstm_error
-status (ANOMALY / NORMAL)
-loggedBy, loggedAt
-Average gas per transaction: ~21,000
-Fallback: In-memory ledger if Ganache is unavailable (perfect for demos)
-
+⛓️ Blockchain Part
+Smart contract: AnomalyLog.sol
+Every anomaly is saved on-chain (Ganache).
+Average gas cost: ~21,000 per transaction.
+If Ganache is not running, it gracefully falls back to in-memory logs.
 
 📄 Research Paper
-Full IEEE-format paper is available in docs/IEEE_Research_Paper.md.
-Key Results:
+Full IEEE paper is inside docs/IEEE_Research_Paper.md
+Key results:
 
 Ensemble accuracy: 98.1%
-End-to-end latency (ML + Blockchain): < 180 ms
-Zero false negatives on critical anomalies in test set
+End-to-end latency: < 180 ms
 
 
 👤 Author
-Project: IoHT-Shield — Blockchain-Assisted Anomaly Detection Framework for IoHT Devices
-Type: Final Year Engineering Project (2025)
+IoHT-Shield – Final Year Engineering Project (2025)
 
 📜 License
-MIT License — Educational use permitted with attribution.
+MIT License
 
-One-Click Run (Backend Only)
-Bash# From project root (after Ganache + deploy)
-python run_app.py
-Important: For full blockchain functionality, Ganache must be running and the contract must be deployed first.
+One-Click Backend Run
+Bashpython run_app.py
+(Make sure Ganache is running and contract is deployed first)
 
-Ready to go!
-Open ffrontend/dashboard.html for instant demo, or follow the full setup for the complete blockchain + ML system.
+Ready to test?
+Open the dashboard and try it out. Any issues or suggestions? Just open an issue.
+</FILE>
+✅ How to use this file:
+
+Copy everything from <FILE filename="README.txt"> to </FILE> (including the tags).
+Paste it into a new file on your computer.
+Save the file as README.txt (or rename it to README.md if you want GitHub to render it nicely).
+
+You now have a clean, ready-to-upload text file. Just drag it into your GitHub repo. Let me know if you want any last tweaks!1.2scant u give me downlaodable txt file containing all 0of thsi<FILE filename="README.txt">
+# 🛡️ IoHT-Shield
+## Blockchain-Assisted Anomaly Detection Framework for Securing IoHT Devices
+Final Year Project | IEEE Research Paper Implementation
+Built with FastAPI, Scikit-learn, TensorFlow, Web3.py, Solidity & Ethereum
+
+📁 Project Structure
+textIoHT-Shield/
+├── ffrontend/                      ← Frontend folder
+│   └── dashboard.html              ← Standalone web dashboard (zero setup)
+├── run_app.py                      ← One-click backend starter
+├── requirements.txt
+├── backend/
+│   ├── main.py
+│   ├── api/
+│   │   ├── routes.py
+│   │   └── schemas.py
+│   ├── ml/
+│   │   ├── isolation_forest.py
+│   │   ├── lstm_autoencoder.py
+│   │   ├── preprocessor.py
+│   │   └── classical_models.py
+│   ├── blockchain/
+│   │   ├── web3_client.py
+│   │   ├── deploy.py
+│   │   └── contracts/
+│   │       └── AnomalyLog.sol
+│   └── models/                     ← (auto-created)
+└── docs/
+    └── IEEE_Research_Paper.md
+
+🚀 Quick Start (No Setup Needed)
+
+Just open ffrontend/dashboard.html in any browser.
+Login with:
+Username: admin
+Password: iothshield
+
+You’ll instantly get:
+
+Live anomaly simulation
+Blockchain logs
+ML metrics & charts
+Manual prediction tester
+
+
+⚙️ Full Setup (Backend + Blockchain)
+Prerequisites
+
+Python 3.10+
+Node.js (for Ganache)
+
+Step 1: Install Python packages
+Bashpip install -r requirements.txt
+Step 2: Start Ganache (Local Ethereum)
+Bash# Run this in a separate terminal
+ganache --port 8545 --accounts 10 --deterministic
+Step 3: Deploy Smart Contract
+Bashcd backend
+python blockchain/deploy.py
+Step 4: Run the Backend
+Easiest way:
+Bashpython run_app.py
+Or manually:
+Bashcd backend
+uvicorn main:app --reload --port 8000
+API docs will be at: http://localhost:8000/docs
+
+📡 Main API Endpoints
+
+MethodEndpointWhat it doesPOST/api/predictDetect anomaly + log to blockchainPOST/api/ingestLive data ingest + WebSocket broadcastPOST/api/upload-dataUpload your dataset (CSV/JSON)POST/api/trainRetrain models in backgroundGET/api/logsGet all blockchain entriesWS/api/ws/streamReal-time updates
+
+🧠 ML Models Used
+
+Isolation Forest – 96.2% accuracy
+LSTM Autoencoder – 97.8% accuracy
+Ensemble (both models) – 98.1% accuracy
+
+All models are unsupervised. Classical models (SVM + Random Forest) are also included for future use.
+
+⛓️ Blockchain Part
+Smart contract: AnomalyLog.sol
+Every anomaly is saved on-chain (Ganache).
+Average gas cost: ~21,000 per transaction.
+If Ganache is not running, it gracefully falls back to in-memory logs.
+
+📄 Research Paper
+Full IEEE paper is inside docs/IEEE_Research_Paper.md
+Key results:
+
+Ensemble accuracy: 98.1%
+End-to-end latency: < 180 ms
+
+
+👤 Author
+IoHT-Shield – Final Year Engineering Project (2025)
+
+📜 License
+MIT License
+
+One-Click Backend Run
+Bashpython run_app.py
+(Make sure Ganache is running and contract is deployed first)
+
+Ready to test?
+Open the dashboard and try it out. Any issues or suggestions? Just open an issue.
+</FILE>
